@@ -5,9 +5,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc --watch & nodemon ./dist/index.js",
-    "start": "nodemon ./dist/index.js",
-    "build": "tsc --build"
+    "dev": "tsc --watch & nodemon ./server/dist/index.js",
+    "start": "nodemon ./server/dist/index.js",
+    "build": "tsc --build ./server"
   },
   "keywords": [],
   "author": "Abid Al Wassie",
