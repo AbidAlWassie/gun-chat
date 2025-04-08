@@ -1,14 +1,14 @@
 {
   "name": "server",
   "version": "1.0.0",
+  "type": "module",
   "description": "",
   "main": "index.js",
   "scripts": {
     "dev": "tsc --watch & nodemon ./dist/index.js",
-    "start": "node ./dist/index.js",
+    "start": "nodemon ./dist/index.js",
     "build": "tsc --build"
   },
-  "type": "module",
   "keywords": [],
   "author": "Abid Al Wassie",
   "license": "ISC",

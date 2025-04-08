@@ -12,7 +12,7 @@ interface ChatListProps {
 
 export function ChatList({ messages }: ChatListProps) {
   return (
-    <div className="h-[400px] overflow-y-auto mb-4">
+    <div className="h-[400px] overflow-y-auto my-4">
       <ul className="space-y-2">
         {messages
           .sort((a, b) => a.createdAt - b.createdAt)

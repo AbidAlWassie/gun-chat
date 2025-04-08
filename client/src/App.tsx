@@ -89,10 +89,10 @@ function App() {
   };
 
   return (
-    <main className="min-h-screen">
+    <main className="h-screen w-screen justify-center items-center overflow-hidden">
       {!isAuthenticated ? (
         <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow-lg">
-          <h1 className="text-2xl font-bold mb-6">Decentralized Chat App</h1>
+          <h2 className="text-2xl font-bold pb-2">Gun Chat</h2>
           <Auth
             alias={alias}
             password={password}
@@ -104,17 +104,19 @@ function App() {
         </div>
       ) : (
         <>
-          <Navbar onLogout={logout} />
-          <div className="max-w-2xl mx-auto p-6">
-            <ChatForm
-              room={room}
-              message={message}
-              setRoom={setRoom}
-              setMessage={setMessage}
-              onJoinRoom={joinRoom}
-              onSendMessage={sendMessage}
-            />
-            <ChatList messages={messages} />
+          <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow-lg">
+            <Navbar onLogout={logout} />
+            <div className="max-w-2xl mx-auto my-2">
+              <ChatForm
+                room={room}
+                message={message}
+                setRoom={setRoom}
+                setMessage={setMessage}
+                onJoinRoom={joinRoom}
+                onSendMessage={sendMessage}
+              />
+              <ChatList messages={messages} />
+            </div>
           </div>
         </>
       )}

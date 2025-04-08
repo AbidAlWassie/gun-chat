@@ -7,8 +7,8 @@ interface NavbarProps {
 
 export function Navbar({ onLogout }: NavbarProps) {
   return (
-    <nav className="flex justify-between items-center p-4 border-b">
-      <h1 className="text-xl font-bold">Decentralized Chat</h1>
+    <nav className="flex justify-between items-center border-b pb-2">
+      <h2 className="text-2xl font-bold">Gun Chat</h2>
       <Button onClick={onLogout}>Logout</Button>
     </nav>
   );
