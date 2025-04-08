@@ -8,7 +8,8 @@ import { ChatForm } from "./components/chat-form";
 import { ChatList } from "./components/chat-list";
 import { Navbar } from "./components/navbar";
 
-const gun = Gun(["http://localhost:8765/gun"]);
+const GUN_URL = import.meta.env.VITE_GUN_URL;
+const gun = Gun([GUN_URL]);
 const user = gun.user();
 
 function App() {
