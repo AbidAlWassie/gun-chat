@@ -1,4 +1,5 @@
 // client/src/components/chat-form.tsx
+import { KeyboardEvent } from "react"; // Import KeyboardEvent type
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
@@ -19,6 +20,14 @@ export function ChatForm({
   onJoinRoom,
   onSendMessage,
 }: ChatFormProps) {
+  // Handle Enter key press
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission or newline
+      onSendMessage(); // Trigger the send message function
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex space-x-2">
@@ -36,6 +45,7 @@ export function ChatForm({
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyDown} // Add keydown handler
           placeholder="Enter your message"
           className="flex-1"
         />
