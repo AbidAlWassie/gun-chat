@@ -1,6 +1,6 @@
 // client/src/App.tsx
 import Gun from "gun";
-import "gun/sea";
+import SEA from "gun/sea";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Auth } from "./components/auth";
@@ -8,10 +8,8 @@ import { ChatForm } from "./components/chat-form";
 import { ChatList } from "./components/chat-list";
 import { Navbar } from "./components/navbar";
 
-// Use Gun's built-in types
 import type { IGunInstance, IGunUserInstance } from "gun";
 
-// Extend IGunInstance for .off()
 interface ExtendedGunInstance extends IGunInstance {
   off(event: string, callback: (...args: unknown[]) => void): void;
 }
@@ -19,7 +17,8 @@ interface ExtendedGunInstance extends IGunInstance {
 const GUN_URL = import.meta.env.VITE_GUN_URL || "http://localhost:8765/gun";
 const gun = Gun({
   peers: [GUN_URL],
-  localStorage: true, // Enable SEA persistence
+  localStorage: true,
+  SEA,
 }) as ExtendedGunInstance;
 const user: IGunUserInstance = gun.user();
 
@@ -37,6 +36,7 @@ function App() {
   const [room, setRoom] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [currentAlias, setCurrentAlias] = useState(""); // Store the alias persistently
 
   useEffect(() => {
     console.log("App mounted, checking auth state...");
@@ -45,29 +45,48 @@ function App() {
       console.log("checkAuth called, user.is:", user.is);
       if (user.is) {
         setIsAuthenticated(true);
-        console.log("Session restored for user:", user.is.alias);
+        const storedAuth = localStorage.getItem("gun-auth");
+        const storedAlias = storedAuth
+          ? JSON.parse(storedAuth).alias
+          : user.is.alias;
+        setCurrentAlias(storedAlias);
+        console.log("Session restored for user:", storedAlias);
       } else {
         console.log("No active session found");
       }
     };
 
-    // Listen for auth events
     gun.on("auth", checkAuth);
 
-    // Attempt to recall session
-    user.recall({ sessionStorage: false }, (ack) => {
-      console.log("Recall result:", ack);
-      if ("err" in ack && ack.err) {
-        console.error("Session recall failed:", ack.err);
-      } else if (user.is) {
-        setIsAuthenticated(true);
-        console.log("Session recalled successfully for:", user.is.alias);
-      } else {
-        console.log("Recall succeeded but no user session available");
+    const storedAuth = localStorage.getItem("gun-auth");
+    if (storedAuth) {
+      const { alias, expiry, seaPair } = JSON.parse(storedAuth);
+      if (Date.now() < expiry && seaPair) {
+        user.auth(seaPair, (ack) => {
+          console.log("Manual SEA recall result:", ack);
+          if ("err" in ack && ack.err) {
+            console.error("Manual recall failed:", ack.err);
+            localStorage.removeItem("gun-auth");
+          } else {
+            setIsAuthenticated(true);
+            setCurrentAlias(alias);
+            console.log("Manual session restored for:", alias);
+          }
+        });
+      } else if (Date.now() < expiry) {
+        user.recall({ sessionStorage: false }, (ack) => {
+          console.log("Gun recall result:", ack);
+          if ("err" in ack && ack.err) {
+            console.error("Gun recall failed:", ack.err);
+          } else if (user.is) {
+            setIsAuthenticated(true);
+            setCurrentAlias(alias);
+            console.log("Gun session restored for:", alias);
+          }
+        });
       }
-    });
+    }
 
-    // Initial check with slight delay to ensure Gun initializes
     setTimeout(checkAuth, 100);
 
     return () => {
@@ -94,11 +113,19 @@ function App() {
       } else {
         console.log("User logged in:", ack);
         setIsAuthenticated(true);
-        const expiry = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-        localStorage.setItem("gun-auth", JSON.stringify({ alias, expiry }));
-        console.log("Stored gun-auth:", localStorage.getItem("gun-auth"));
-        // Log SEA keys for debugging
-        console.log("SEA keys in localStorage:", {
+        setCurrentAlias(alias);
+        const expiry = Date.now() + 24 * 60 * 60 * 1000;
+        const authData = {
+          alias,
+          expiry,
+          seaPair: ack.sea,
+        };
+        localStorage.setItem("gun-auth", JSON.stringify(authData));
+        console.log(
+          "Stored gun-auth with SEA pair:",
+          localStorage.getItem("gun-auth")
+        );
+        console.log("Native SEA keys in localStorage:", {
           pub: localStorage.getItem(`sea/pub:${alias}`),
           priv: localStorage.getItem(`sea/priv:${alias}`),
         });
@@ -110,6 +137,7 @@ function App() {
     user.leave();
     console.log("User logged out");
     setIsAuthenticated(false);
+    setCurrentAlias("");
     setMessages([]);
     localStorage.removeItem("gun-auth");
     console.log("gun-auth removed from localStorage");
@@ -141,7 +169,7 @@ function App() {
     const newMessage: Message = {
       id: messageId,
       content: message,
-      sender: typeof user.is?.alias === "string" ? user.is.alias : "Anonymous",
+      sender: currentAlias || "Anonymous",
       createdAt: Date.now(),
     };
     gun
