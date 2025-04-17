@@ -38,7 +38,9 @@ export function ChatForm({
           placeholder="Enter chat room"
           className="flex-1"
         />
-        <Button onClick={onJoinRoom}>Join Room</Button>
+        <Button onClick={onJoinRoom} className="">
+          Join Room
+        </Button>
       </div>
       <div className="flex space-x-2">
         <Input
@@ -49,7 +51,9 @@ export function ChatForm({
           placeholder="Enter your message"
           className="flex-1"
         />
-        <Button onClick={onSendMessage}>Send</Button>
+        <Button onClick={onSendMessage} className="text-foreground">
+          Send
+        </Button>
       </div>
     </div>
   );

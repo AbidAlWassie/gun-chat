@@ -1,4 +1,5 @@
 // client/src/App.tsx
+import type { IGunInstance, IGunUserInstance } from "gun";
 import Gun from "gun";
 import SEA from "gun/sea";
 import { useEffect, useState } from "react";
@@ -7,8 +8,6 @@ import { Auth } from "./components/auth";
 import { ChatForm } from "./components/chat-form";
 import { ChatList } from "./components/chat-list";
 import { Navbar } from "./components/navbar";
-
-import type { IGunInstance, IGunUserInstance } from "gun";
 
 interface ExtendedGunInstance extends IGunInstance {
   off(event: string, callback: (...args: unknown[]) => void): void;
