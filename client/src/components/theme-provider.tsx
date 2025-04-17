@@ -1,7 +1,3 @@
-"use client";
-
-import type React from "react";
-
 import { createContext, useContext, useEffect, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
@@ -37,15 +33,18 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
 
-    // First remove all theme classes
     root.classList.remove("light", "dark");
 
     if (theme === "system") {
-      // For system theme, we don't add any class and let the media query handle it
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+
+      root.classList.add(systemTheme);
       return;
     }
 
-    // For explicit theme choice, add the appropriate class
     root.classList.add(theme);
   }, [theme]);
 

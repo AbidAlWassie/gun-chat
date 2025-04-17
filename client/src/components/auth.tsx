@@ -34,8 +34,12 @@ export function Auth({
         placeholder="Password"
       />
       <div className="flex space-x-2">
-        <Button onClick={onRegister}>Register</Button>
-        <Button onClick={onLogin}>Login</Button>
+        <Button onClick={onRegister} className="bg-foreground text-foreground">
+          Register
+        </Button>
+        <Button onClick={onLogin} className="bg-foreground text-foreground">
+          Login
+        </Button>
       </div>
     </div>
   );
