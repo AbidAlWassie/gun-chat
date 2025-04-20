@@ -1,4 +1,6 @@
 // client/src/components/chat-list.tsx
+import { useEffect, useRef } from "react";
+
 interface Message {
   id: string;
   content: string;
@@ -11,6 +13,9 @@ interface ChatListProps {
 }
 
 export function ChatList({ messages }: ChatListProps) {
+  // Create a ref for the messages container
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
   // Format timestamp to a readable format
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -31,6 +36,16 @@ export function ChatList({ messages }: ChatListProps) {
     }
   };
 
+  // Scroll to bottom function
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Auto-scroll when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   // Group messages by date
   const groupedMessages = messages
     .sort((a, b) => a.createdAt - b.createdAt)
@@ -48,7 +63,7 @@ export function ChatList({ messages }: ChatListProps) {
       {Object.entries(groupedMessages).map(([date, dateMessages]) => (
         <div key={date} className="mb-4">
           <div className="text-center my-2">
-            <span className="text-xs bg-background px-2 py-1 rounded-full">
+            <span className="text-xs bg-muted px-2 py-1 rounded-full text-muted-foreground">
               {formatDate(dateMessages[0].createdAt)}
             </span>
           </div>
@@ -60,7 +75,7 @@ export function ChatList({ messages }: ChatListProps) {
               >
                 <div className="flex justify-between items-start">
                   <strong className="font-semibold">{message.sender}</strong>
-                  <span className="text-xs">
+                  <span className="text-xs text-muted-foreground">
                     {formatTime(message.createdAt)}
                   </span>
                 </div>
@@ -71,10 +86,12 @@ export function ChatList({ messages }: ChatListProps) {
         </div>
       ))}
       {messages.length === 0 && (
-        <div className="h-full flex items-center justify-center">
+        <div className="h-full flex items-center justify-center text-muted-foreground">
           No messages yet. Join a room and start chatting!
         </div>
       )}
+      {/* Invisible element to scroll to */}
+      <div ref={messagesEndRef} />
     </div>
   );
 }
