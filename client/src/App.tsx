@@ -203,6 +203,7 @@ function App() {
           <div className="max-w-md mx-auto mt-10 p-6 border rounded-lg shadow-lg">
             <Navbar onLogout={logout} />
             <div className="max-w-2xl mx-auto my-2">
+              <ChatList messages={messages} />
               <ChatForm
                 room={room}
                 message={message}
@@ -211,7 +212,6 @@ function App() {
                 onJoinRoom={joinRoom}
                 onSendMessage={sendMessage}
               />
-              <ChatList messages={messages} />
             </div>
           </div>
         </>
